@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Card Game</title>
+    <link rel="stylesheet" href="src/styles.css">
+</head>
+<body>
+    <div id="game-container" class="game">
+        <header>
+            <h1>Memory Card Game</h1>
+            <div class="stats">
+                <span class="timer">Time: <span id="timer">0</span>s</span>
+                <span class="score">Score: <span id="score">0</span></span>
+                <span class="moves">Moves: <span id="moves">0</span></span>
+            </div>
+        </header>
+        
+        <div class="controls">
+            <select id="difficulty" aria-label="Game Difficulty">
+                <option value="easy">Easy (4×3)</option>
+                <option value="medium" selected>Medium (4×4)</option>
+                <option value="hard">Hard (6×4)</option>
+            </select>
+            <button id="restart" aria-label="Restart Game">Restart</button>
+            <button id="pause" aria-label="Pause Game">Pause</button>
+        </div>
+
+        <div id="board" class="board" role="main" aria-label="Game Board">
+            <!-- Cards rendered here by JS -->
+        </div>
+
+        <!-- Live region for screen reader announcements -->
+        <div id="announcements" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+    </div>
+
+    <!-- Win Modal -->
+    <div class="modal" id="winModal" role="dialog" aria-labelledby="modalTitle" aria-hidden="true">
+        <div class="modal-content">
+            <h2 id="modalTitle">🎉 You Won!</h2>
+            <p>Time: <span id="finalTime">0</span>s</p>
+            <p>Score: <span id="finalScore">0</span></p>
+            <p>Best Time: <span id="bestTime">--</span>s</p>
+            <button id="playAgain">Play Again</button>
+        </div>
+    </div>
+
+    <script type="module" src="src/main.js"></script>
+</body>
+</html>

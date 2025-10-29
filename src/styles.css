@@ -1,0 +1,361 @@
+/* CSS Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+/* Game Container */
+.game {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    max-width: 800px;
+    width: 100%;
+}
+
+/* Header */
+header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+header h1 {
+    font-size: 2.5rem;
+    color: #4a5568;
+    margin-bottom: 20px;
+    font-weight: 700;
+}
+
+.stats {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+.stats span {
+    background: #f7fafc;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    color: #2d3748;
+    border: 2px solid #e2e8f0;
+}
+
+/* Controls */
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.controls select,
+.controls button {
+    padding: 12px 20px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: white;
+    color: #4a5568;
+}
+
+.controls select:focus,
+.controls button:focus {
+    outline: none;
+    border-color: #3182ce;
+    box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+}
+
+.controls button:hover {
+    background: #f7fafc;
+    border-color: #cbd5e0;
+}
+
+.controls button:active {
+    transform: translateY(1px);
+}
+
+/* Game Board */
+.board {
+    display: grid;
+    gap: 15px;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+
+/* Grid layouts for different difficulties */
+.board.easy {
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+}
+
+.board.medium {
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+}
+
+.board.hard {
+    grid-template-columns: repeat(6, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+}
+
+/* Card Styles */
+.card {
+    width: 80px;
+    height: 80px;
+    background: #4a5568;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    position: relative;
+    perspective: 1000px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: white;
+    font-weight: bold;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.card:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px #3182ce;
+}
+
+.card:active {
+    transform: translateY(0);
+}
+
+.card.flipped {
+    background: #48bb78;
+    transform: rotateY(180deg);
+}
+
+.card.matched {
+    background: #38a169;
+    opacity: 0.8;
+}
+
+.card-front,
+.card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backface-visibility: hidden;
+    border-radius: 12px;
+}
+
+.card-front {
+    background: #4a5568;
+    color: white;
+}
+
+.card-back {
+    background: #48bb78;
+    color: white;
+    transform: rotateY(180deg);
+}
+
+/* Motion Reduction Support */
+@media (prefers-reduced-motion: reduce) {
+    .card {
+        transition: none;
+        transform: none !important;
+    }
+    
+    .card.flipped {
+        transform: none !important;
+    }
+    
+    .card:hover {
+        transform: none !important;
+    }
+}
+
+/* Win Modal */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    padding: 40px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    max-width: 400px;
+    width: 90%;
+}
+
+.modal-content h2 {
+    font-size: 2rem;
+    color: #4a5568;
+    margin-bottom: 20px;
+}
+
+.modal-content p {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    color: #2d3748;
+}
+
+.modal-content button {
+    background: #3182ce;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background 0.2s ease;
+}
+
+.modal-content button:hover {
+    background: #2c5aa0;
+}
+
+.modal-content button:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.3);
+}
+
+/* Screen Reader Only */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .game {
+        padding: 20px;
+        margin: 10px;
+    }
+    
+    header h1 {
+        font-size: 2rem;
+    }
+    
+    .stats {
+        gap: 15px;
+    }
+    
+    .stats span {
+        padding: 8px 15px;
+        font-size: 0.9rem;
+    }
+    
+    .card {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+    }
+    
+    .board {
+        gap: 10px;
+    }
+    
+    .controls {
+        gap: 10px;
+    }
+    
+    .controls select,
+    .controls button {
+        padding: 10px 15px;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .game {
+        padding: 15px;
+    }
+    
+    header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .card {
+        width: 50px;
+        height: 50px;
+        font-size: 1.2rem;
+    }
+    
+    .board {
+        gap: 8px;
+    }
+    
+    .modal-content {
+        padding: 30px 20px;
+    }
+    
+    .modal-content h2 {
+        font-size: 1.8rem;
+    }
+    
+    .modal-content p {
+        font-size: 1.1rem;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .card {
+        border: 2px solid #000;
+    }
+    
+    .card:focus {
+        box-shadow: 0 0 0 3px #000;
+    }
+    
+    .controls select:focus,
+    .controls button:focus {
+        box-shadow: 0 0 0 3px #000;
+    }
+}
