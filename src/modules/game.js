@@ -1,8 +1,36 @@
 // Game Core Logic Module
 import { shuffleArray } from '../utils/shuffle.js';
 
+/**
+ * @typedef {'easy' | 'medium' | 'hard'} Difficulty
+ */
+
+/**
+ * @typedef {object} Card
+ * @property {number} id
+ * @property {string} icon
+ * @property {boolean} matched
+ */
+
+/**
+ * @typedef {object} GameState
+ * @property {Card[]} deck
+ * @property {number[]} flipped
+ * @property {Set<number>} matched
+ * @property {number} moves
+ * @property {number} score
+ * @property {number} streakCount
+ * @property {number | null} startTime
+ * @property {number} elapsedTime
+ * @property {Difficulty} difficulty
+ * @property {boolean} isPaused
+ * @property {boolean} isWon
+ * @property {boolean} isLocked
+ */
+
 export class Game {
     constructor() {
+        /** @type {GameState} */
         this.state = {
             deck: [],
             flipped: [],
@@ -18,7 +46,9 @@ export class Game {
             isLocked: false
         };
         
+        /** @type {NodeJS.Timeout | null} */
         this.timerInterval = null;
+        /** @type {Record<Difficulty, string[]>} */
         this.iconSets = {
             easy: ['🍎', '🍊', '🍌', '🍇', '🍓', '🥝'],
             medium: ['🍎', '🍊', '🍌', '🍇', '🍓', '🥝', '🍑', '🥭'],
@@ -26,6 +56,10 @@ export class Game {
         };
     }
 
+    /**
+     * Initializes the game with a given difficulty.
+     * @param {Difficulty} difficulty The game difficulty.
+     */
     init(difficulty = 'medium') {
         this.state.difficulty = difficulty;
         this.state.deck = this.createDeck();
@@ -43,8 +77,13 @@ export class Game {
         this.stopTimer();
     }
 
+    /**
+     * Creates a new deck of cards based on the current difficulty.
+     * @returns {Card[]} The created deck.
+     */
     createDeck() {
         const icons = this.iconSets[this.state.difficulty];
+        /** @type {Card[]} */
         const deck = [];
         
         // Create pairs
@@ -57,6 +96,11 @@ export class Game {
         return shuffleArray(deck);
     }
 
+    /**
+     * Flips a card and checks for a match if two cards are flipped.
+     * @param {number} cardId The ID of the card to flip.
+     * @returns {boolean} Whether the card was flipped.
+     */
     flipCard(cardId) {
         if (this.state.isLocked || this.state.isPaused || this.state.isWon) {
             return false;
@@ -93,10 +137,10 @@ export class Game {
         const card1 = this.state.deck.find(c => c.id === card1Id);
         const card2 = this.state.deck.find(c => c.id === card2Id);
 
-        if (card1.icon === card2.icon) {
+        if (card1?.icon === card2?.icon) {
             // Match found
-            card1.matched = true;
-            card2.matched = true;
+            if (card1) card1.matched = true;
+            if (card2) card2.matched = true;
             this.state.matched.add(card1Id);
             this.state.matched.add(card2Id);
             
@@ -127,7 +171,7 @@ export class Game {
     startTimer() {
         this.state.startTime = Date.now();
         this.timerInterval = setInterval(() => {
-            if (!this.state.isPaused) {
+            if (!this.state.isPaused && this.state.startTime) {
                 this.state.elapsedTime = Math.floor((Date.now() - this.state.startTime) / 1000);
             }
         }, 1000);
@@ -157,10 +201,17 @@ export class Game {
         this.init(this.state.difficulty);
     }
 
+    /**
+     * @returns {GameState}
+     */
     getState() {
         return { ...this.state };
     }
 
+    /**
+     * @param {number} cardId
+     * @returns {Card | undefined}
+     */
     getCardById(cardId) {
         return this.state.deck.find(c => c.id === cardId);
     }

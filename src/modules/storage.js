@@ -1,8 +1,28 @@
 // Storage Manager Module
+/**
+ * @typedef {'easy' | 'medium' | 'hard'} Difficulty
+ */
+
+/**
+ * @typedef {object} Score
+ * @property {number | null} time
+ * @property {number} score
+ * @property {string | null} date
+ */
+
+/**
+ * @typedef {object} Scores
+ * @property {Score} easy
+ * @property {Score} medium
+ * @property {Score} hard
+ * @property {string} [version]
+ */
+
 export class StorageManager {
     constructor() {
         this.storageKey = 'memoryGameScores';
         this.schemaVersion = '1.0';
+        /** @type {Scores} */
         this.defaultScores = {
             easy: { time: null, score: 0, date: null },
             medium: { time: null, score: 0, date: null },
@@ -10,7 +30,9 @@ export class StorageManager {
         };
     }
 
-    // Load best scores from localStorage
+    /**
+     * @returns {Scores}
+     */
     loadBestScores() {
         try {
             const stored = localStorage.getItem(this.storageKey);
@@ -19,9 +41,8 @@ export class StorageManager {
                 return this.defaultScores;
             }
 
-            const scores = JSON.parse(stored);
+            const scores = /** @type {Scores} */ (JSON.parse(stored));
             
-            // Check schema version and migrate if needed
             if (!scores.version || scores.version !== this.schemaVersion) {
                 scores.version = this.schemaVersion;
                 this.saveScores(scores);
@@ -35,7 +56,9 @@ export class StorageManager {
         }
     }
 
-    // Save scores to localStorage
+    /**
+     * @param {Scores} scores
+     */
     saveScores(scores) {
         try {
             scores.version = this.schemaVersion;
@@ -45,49 +68,56 @@ export class StorageManager {
         }
     }
 
-    // Save a new score if it's better than the current best
+    /**
+     * @param {Difficulty} difficulty
+     * @param {number} time
+     * @param {number} score
+     * @returns {boolean}
+     */
     saveScore(difficulty, time, score) {
         const scores = this.loadBestScores();
         const currentBest = scores[difficulty];
 
-        // Check if this is a better time (lower is better)
         const isBetterTime = !currentBest.time || time < currentBest.time;
-        
-        // Check if this is a better score (higher is better)
         const isBetterScore = score > currentBest.score;
 
         if (isBetterTime || isBetterScore) {
             scores[difficulty] = {
                 time: isBetterTime ? time : currentBest.time,
                 score: isBetterScore ? score : currentBest.score,
-                date: new Date().toISOString().split('T')[0] // YYYY-MM-DD format
+                date: new Date().toISOString().split('T')[0]
             };
-
             this.saveScores(scores);
-            return true; // Score was saved
+            return true;
         }
-
-        return false; // Score was not better
+        return false;
     }
 
-    // Get best time for a difficulty
+    /**
+     * @param {Difficulty} difficulty
+     * @returns {number | null}
+     */
     getBestTime(difficulty) {
         const scores = this.loadBestScores();
         return scores[difficulty]?.time || null;
     }
 
-    // Get best score for a difficulty
+    /**
+     * @param {Difficulty} difficulty
+     * @returns {number}
+     */
     getBestScore(difficulty) {
         const scores = this.loadBestScores();
         return scores[difficulty]?.score || 0;
     }
 
-    // Get all scores
+    /**
+     * @returns {Scores}
+     */
     getAllScores() {
         return this.loadBestScores();
     }
 
-    // Clear all scores (for testing or reset)
     clearScores() {
         try {
             localStorage.removeItem(this.storageKey);
@@ -97,37 +127,34 @@ export class StorageManager {
         }
     }
 
-    // Export scores (for backup or sharing)
+    /**
+     * @returns {string}
+     */
     exportScores() {
         const scores = this.loadBestScores();
-        const exportData = {
+        return JSON.stringify({
             version: this.schemaVersion,
             exportDate: new Date().toISOString(),
-            scores: scores
-        };
-
-        return JSON.stringify(exportData, null, 2);
+            scores
+        }, null, 2);
     }
 
-    // Import scores (for restore from backup)
+    /**
+     * @param {string} jsonData
+     * @returns {boolean}
+     */
     importScores(jsonData) {
         try {
             const importData = JSON.parse(jsonData);
-            
-            // Validate structure
             if (!importData.scores || typeof importData.scores !== 'object') {
                 throw new Error('Invalid scores data structure');
             }
-
-            // Validate difficulty levels
             const requiredDifficulties = ['easy', 'medium', 'hard'];
             for (const difficulty of requiredDifficulties) {
                 if (!importData.scores[difficulty]) {
                     throw new Error(`Missing difficulty: ${difficulty}`);
                 }
             }
-
-            // Save imported scores
             this.saveScores(importData.scores);
             return true;
         } catch (error) {
@@ -136,86 +163,66 @@ export class StorageManager {
         }
     }
 
-    // Check if localStorage is available
     isStorageAvailable() {
         try {
             const testKey = '__test__';
             localStorage.setItem(testKey, 'test');
             localStorage.removeItem(testKey);
             return true;
-        } catch (error) {
+        } catch {
             return false;
         }
     }
 
-    // Get storage usage info
     getStorageInfo() {
         try {
             const scores = this.loadBestScores();
             const dataSize = JSON.stringify(scores).length;
-            
             return {
                 available: this.isStorageAvailable(),
-                dataSize: dataSize,
+                dataSize,
                 quota: this.getStorageQuota(),
                 usage: (dataSize / this.getStorageQuota() * 100).toFixed(2) + '%'
             };
         } catch (error) {
             return {
                 available: false,
-                error: error.message
+                error: (/** @type {Error} */ (error)).message
             };
         }
     }
 
-    // Estimate storage quota (approximate)
     getStorageQuota() {
-        // Most browsers have 5-10MB localStorage limit
-        // This is a rough estimate
-        return 5 * 1024 * 1024; // 5MB in bytes
+        return 5 * 1024 * 1024; // 5MB
     }
 
-    // Migration helpers for future schema changes
+    /**
+     * @param {string} fromVersion
+     * @param {string} toVersion
+     */
     migrateScores(fromVersion, toVersion) {
         const scores = this.loadBestScores();
-        
-        // Example migration logic (can be expanded for future versions)
         if (fromVersion === '1.0' && toVersion === '1.1') {
-            // Add new fields, transform existing data, etc.
             console.log('Migrating scores from version 1.0 to 1.1');
         }
-
         scores.version = toVersion;
         this.saveScores(scores);
     }
 
-    // Validate score data integrity
+    /**
+     * @param {Scores} scores
+     * @returns {boolean}
+     */
     validateScores(scores) {
+        /** @type {Difficulty[]} */
         const requiredDifficulties = ['easy', 'medium', 'hard'];
-        
         for (const difficulty of requiredDifficulties) {
             const score = scores[difficulty];
-            
-            if (!score || typeof score !== 'object') {
-                return false;
-            }
-
-            // Validate time (should be number or null)
-            if (score.time !== null && (typeof score.time !== 'number' || score.time < 0)) {
-                return false;
-            }
-
-            // Validate score (should be number >= 0)
-            if (typeof score.score !== 'number' || score.score < 0) {
-                return false;
-            }
-
-            // Validate date (should be string or null)
-            if (score.date !== null && typeof score.date !== 'string') {
-                return false;
-            }
+            if (!score || typeof score !== 'object') return false;
+            if (score.time !== null && (typeof score.time !== 'number' || score.time < 0)) return false;
+            if (typeof score.score !== 'number' || score.score < 0) return false;
+            if (score.date !== null && typeof score.date !== 'string') return false;
         }
-
         return true;
     }
 }

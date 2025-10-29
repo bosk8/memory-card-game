@@ -1,4 +1,10 @@
 // DOM Rendering Module
+/**
+ * @typedef {import('./game.js').GameState} GameState
+ * @typedef {import('./game.js').Card} Card
+ * @typedef {import('./game.js').Difficulty} Difficulty
+ */
+
 export class DOMRenderer {
     constructor() {
         this.board = document.getElementById('board');
@@ -6,32 +12,53 @@ export class DOMRenderer {
         this.scoreElement = document.getElementById('score');
         this.movesElement = document.getElementById('moves');
         this.pauseButton = document.getElementById('pause');
+
+        if (!this.board || !this.timerElement || !this.scoreElement || !this.movesElement || !this.pauseButton) {
+            throw new Error('Missing required DOM elements');
+        }
     }
 
+    /**
+     * @param {GameState} state
+     */
     renderBoard(state) {
         this.clearBoard();
         this.updateBoardClass(state.difficulty);
         
         state.deck.forEach(card => {
             const cardElement = this.createCardElement(card, state);
-            this.board.appendChild(cardElement);
+            if (this.board) {
+                this.board.appendChild(cardElement);
+            }
         });
         
         this.updateStats(state);
     }
 
     clearBoard() {
-        this.board.innerHTML = '';
+        if (this.board) {
+            this.board.innerHTML = '';
+        }
     }
 
+    /**
+     * @param {Difficulty} difficulty
+     */
     updateBoardClass(difficulty) {
-        this.board.className = `board ${difficulty}`;
+        if (this.board) {
+            this.board.className = `board ${difficulty}`;
+        }
     }
 
+    /**
+     * @param {Card} card
+     * @param {GameState} state
+     * @returns {HTMLButtonElement}
+     */
     createCardElement(card, state) {
         const cardEl = document.createElement('button');
         cardEl.className = 'card';
-        cardEl.dataset.id = card.id;
+        cardEl.dataset.id = String(card.id);
         cardEl.dataset.icon = card.icon;
         cardEl.setAttribute('aria-pressed', 'false');
         cardEl.setAttribute('aria-label', `Card ${card.id + 1} of ${state.deck.length}`);
@@ -55,6 +82,10 @@ export class DOMRenderer {
         return cardEl;
     }
 
+    /**
+     * @param {number} cardId
+     * @param {GameState} state
+     */
     updateCard(cardId, state) {
         const cardElement = this.board.querySelector(`[data-id="${cardId}"]`);
         if (!cardElement) return;
@@ -71,7 +102,7 @@ export class DOMRenderer {
         } else if (isFlipped) {
             cardElement.classList.add('flipped');
             cardElement.setAttribute('aria-pressed', 'true');
-            cardElement.setAttribute('aria-label', `Card ${cardId + 1} of ${state.deck.length}, showing ${card.icon}`);
+            cardElement.setAttribute('aria-label', `Card ${cardId + 1} of ${state.deck.length}, showing ${card?.icon}`);
         } else {
             cardElement.classList.remove('flipped', 'matched');
             cardElement.setAttribute('aria-pressed', 'false');
@@ -79,46 +110,74 @@ export class DOMRenderer {
         }
     }
 
+    /**
+     * @param {GameState} state
+     */
     updateStats(state) {
-        this.timerElement.textContent = state.elapsedTime;
-        this.scoreElement.textContent = state.score;
-        this.movesElement.textContent = state.moves;
+        if (this.timerElement) this.timerElement.textContent = String(state.elapsedTime);
+        if (this.scoreElement) this.scoreElement.textContent = String(state.score);
+        if (this.movesElement) this.movesElement.textContent = String(state.moves);
     }
 
+    /**
+     * @param {boolean} isPaused
+     */
     updatePauseButton(isPaused) {
-        this.pauseButton.textContent = isPaused ? 'Resume' : 'Pause';
-        this.pauseButton.setAttribute('aria-label', isPaused ? 'Resume Game' : 'Pause Game');
+        if (this.pauseButton) {
+            this.pauseButton.textContent = isPaused ? 'Resume' : 'Pause';
+            this.pauseButton.setAttribute('aria-label', isPaused ? 'Resume Game' : 'Pause Game');
+        }
     }
 
+    /**
+     * @param {Difficulty} difficulty
+     */
     updateDifficultySelector(difficulty) {
-        const selector = document.getElementById('difficulty');
-        selector.value = difficulty;
+        const selector = /** @type {HTMLSelectElement} */ (document.getElementById('difficulty'));
+        if (selector) {
+            selector.value = difficulty;
+        }
     }
 
+    /**
+     * @param {GameState} state
+     * @param {number | null} bestTime
+     */
     showWinModal(state, bestTime) {
         const modal = document.getElementById('winModal');
         const finalTime = document.getElementById('finalTime');
         const finalScore = document.getElementById('finalScore');
         const bestTimeElement = document.getElementById('bestTime');
 
-        finalTime.textContent = state.elapsedTime;
-        finalScore.textContent = state.score;
-        bestTimeElement.textContent = bestTime || '--';
+        if (finalTime) finalTime.textContent = String(state.elapsedTime);
+        if (finalScore) finalScore.textContent = String(state.score);
+        if (bestTimeElement) bestTimeElement.textContent = bestTime ? String(bestTime) : '--';
 
-        modal.setAttribute('aria-hidden', 'false');
-        modal.style.display = 'flex';
+        if (modal) {
+            modal.setAttribute('aria-hidden', 'false');
+            modal.style.display = 'flex';
+        }
 
         // Focus on play again button
-        document.getElementById('playAgain').focus();
+        const playAgainButton = /** @type {HTMLButtonElement} */ (document.getElementById('playAgain'));
+        if (playAgainButton) {
+            playAgainButton.focus();
+        }
     }
 
     hideWinModal() {
         const modal = document.getElementById('winModal');
-        modal.setAttribute('aria-hidden', 'true');
-        modal.style.display = 'none';
+        if (modal) {
+            modal.setAttribute('aria-hidden', 'true');
+            modal.style.display = 'none';
+        }
     }
 
-    // Animation helpers
+    /**
+     * @param {HTMLElement} cardElement
+     * @param {boolean} isFlipped
+     * @returns {Promise<void>}
+     */
     animateCardFlip(cardElement, isFlipped) {
         if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
             // Skip animation for users who prefer reduced motion
@@ -134,22 +193,26 @@ export class DOMRenderer {
         });
     }
 
-    // Focus management
+    /**
+     * @param {number} cardId
+     */
     focusCard(cardId) {
-        const cardElement = this.board.querySelector(`[data-id="${cardId}"]`);
+        const cardElement = /** @type {HTMLElement} */ (this.board.querySelector(`[data-id="${cardId}"]`));
         if (cardElement) {
             cardElement.focus();
         }
     }
 
     focusFirstCard() {
-        const firstCard = this.board.querySelector('.card');
+        const firstCard = /** @type {HTMLElement} */ (this.board.querySelector('.card'));
         if (firstCard) {
             firstCard.focus();
         }
     }
 
-    // Keyboard navigation helpers
+    /**
+     * @param {HTMLElement} cardElement
+     */
     getCardPosition(cardElement) {
         const cards = Array.from(this.board.querySelectorAll('.card'));
         const index = cards.indexOf(cardElement);
@@ -173,6 +236,10 @@ export class DOMRenderer {
         }
     }
 
+    /**
+     * @param {HTMLElement} currentCard
+     * @param {string} direction
+     */
     navigateToCard(currentCard, direction) {
         const config = this.getCurrentGridConfig();
         const currentPos = this.getCardPosition(currentCard);
@@ -196,7 +263,7 @@ export class DOMRenderer {
 
         const newIndex = newRow * config.cols + newCol;
         const cards = Array.from(this.board.querySelectorAll('.card'));
-        const targetCard = cards[newIndex];
+        const targetCard = /** @type {HTMLElement} */ (cards[newIndex]);
 
         if (targetCard) {
             targetCard.focus();

@@ -1,7 +1,14 @@
 // Accessibility Manager Module
+/**
+ * @typedef {import('./game.js').Difficulty} Difficulty
+ * @typedef {import('./game.js').GameState} GameState
+ */
+
 export class AccessibilityManager {
     constructor() {
+        /** @type {HTMLElement | null} */
         this.announcementsElement = document.getElementById('announcements');
+        /** @type {HTMLElement | null} */
         this.lastFocusedElement = null;
     }
 
@@ -16,18 +23,23 @@ export class AccessibilityManager {
             const activeElement = document.activeElement;
             
             // Handle arrow key navigation for cards
-            if (activeElement.classList.contains('card')) {
+            if (activeElement && activeElement.classList.contains('card')) {
                 if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
                     e.preventDefault();
-                    this.handleArrowNavigation(e.key, activeElement);
+                    this.handleArrowNavigation(e.key, /** @type {HTMLElement} */ (activeElement));
                 }
             }
         });
     }
 
+    /**
+     * @param {string} direction
+     * @param {HTMLElement} currentCard
+     */
     handleArrowNavigation(direction, currentCard) {
         const board = document.getElementById('board');
-        const cards = Array.from(board.querySelectorAll('.card'));
+        if (!board) return;
+        const cards = /** @type {HTMLElement[]} */ (Array.from(board.querySelectorAll('.card')));
         const currentIndex = cards.indexOf(currentCard);
         
         let newIndex = currentIndex;
@@ -53,6 +65,9 @@ export class AccessibilityManager {
         }
     }
 
+    /**
+     * @param {HTMLElement} board
+     */
     getGridConfig(board) {
         const boardClass = board.className;
         if (boardClass.includes('easy')) {
@@ -67,10 +82,11 @@ export class AccessibilityManager {
     setupFocusManagement() {
         // Track focus changes
         document.addEventListener('focusin', (e) => {
-            if (e.target.classList.contains('card') || 
-                e.target.classList.contains('controls') ||
-                e.target.closest('.controls')) {
-                this.lastFocusedElement = e.target;
+            const target = /** @type {HTMLElement} */ (e.target);
+            if (target.classList.contains('card') ||
+                target.classList.contains('controls') ||
+                target.closest('.controls')) {
+                this.lastFocusedElement = target;
             }
         });
 
@@ -87,14 +103,16 @@ export class AccessibilityManager {
 
     closeModalAndRestoreFocus() {
         const modal = document.getElementById('winModal');
-        modal.setAttribute('aria-hidden', 'true');
-        modal.style.display = 'none';
+        if (modal) {
+            modal.setAttribute('aria-hidden', 'true');
+            modal.style.display = 'none';
+        }
         
         // Restore focus to last focused element or first card
         if (this.lastFocusedElement && this.lastFocusedElement.classList.contains('card')) {
             this.lastFocusedElement.focus();
         } else {
-            const firstCard = document.querySelector('.card');
+            const firstCard = /** @type {HTMLElement} */ (document.querySelector('.card'));
             if (firstCard) {
                 firstCard.focus();
             }
@@ -119,6 +137,10 @@ export class AccessibilityManager {
         });
     }
 
+    /**
+     * @param {string} message
+     * @param {'polite' | 'assertive'} [priority='polite']
+     */
     announce(message, priority = 'polite') {
         if (!this.announcementsElement) return;
 
@@ -130,26 +152,44 @@ export class AccessibilityManager {
         
         // Add new announcement
         setTimeout(() => {
-            this.announcementsElement.textContent = message;
+            if (this.announcementsElement) {
+                this.announcementsElement.textContent = message;
+            }
         }, 100);
     }
 
+    /**
+     * @param {number} score
+     */
     announceMatch(score) {
         this.announce(`Match found! +10 points. Total score: ${score}`);
     }
 
+    /**
+     * @param {number} score
+     */
     announceMismatch(score) {
         this.announce(`No match. -2 points. Total score: ${score}`);
     }
 
+    /**
+     * @param {number} score
+     */
     announceStreakBonus(score) {
         this.announce(`Streak bonus! +5 points. Total score: ${score}`);
     }
 
+    /**
+     * @param {number} time
+     * @param {number} score
+     */
     announceWin(time, score) {
         this.announce(`Congratulations! You won in ${time} seconds with a score of ${score}!`, 'assertive');
     }
 
+    /**
+     * @param {Difficulty} difficulty
+     */
     announceGameStart(difficulty) {
         const difficultyNames = {
             easy: 'Easy (4×3)',
@@ -159,6 +199,9 @@ export class AccessibilityManager {
         this.announce(`Game started. Difficulty: ${difficultyNames[difficulty]}`);
     }
 
+    /**
+     * @param {boolean} isPaused
+     */
     announcePause(isPaused) {
         const message = isPaused ? 'Game paused' : 'Game resumed';
         this.announce(message);
@@ -168,9 +211,12 @@ export class AccessibilityManager {
         this.announce('Game restarted');
     }
 
-    // ARIA label helpers
+    /**
+     * @param {HTMLElement} cardElement
+     * @param {GameState} state
+     */
     updateCardAriaLabel(cardElement, state) {
-        const cardId = parseInt(cardElement.dataset.id);
+        const cardId = parseInt(cardElement.dataset.id || '');
         const card = state.deck.find(c => c.id === cardId);
         const isFlipped = state.flipped.includes(cardId);
         const isMatched = state.matched.has(cardId);
@@ -180,7 +226,7 @@ export class AccessibilityManager {
         if (isMatched) {
             label += ', matched';
         } else if (isFlipped) {
-            label += `, showing ${card.icon}`;
+            label += `, showing ${card?.icon}`;
         } else {
             label += ', face down';
         }
@@ -188,6 +234,9 @@ export class AccessibilityManager {
         cardElement.setAttribute('aria-label', label);
     }
 
+    /**
+     * @param {GameState} state
+     */
     updateControlAriaLabels(state) {
         const pauseButton = document.getElementById('pause');
         const restartButton = document.getElementById('restart');
@@ -206,23 +255,25 @@ export class AccessibilityManager {
         }
     }
 
-    // Focus helpers
     focusFirstInteractiveElement() {
-        const firstCard = document.querySelector('.card');
+        const firstCard = /** @type {HTMLElement} */ (document.querySelector('.card'));
         if (firstCard) {
             firstCard.focus();
         } else {
-            const firstControl = document.querySelector('.controls button, .controls select');
+            const firstControl = /** @type {HTMLElement} */ (document.querySelector('.controls button, .controls select'));
             if (firstControl) {
                 firstControl.focus();
             }
         }
     }
 
+    /**
+     * @param {HTMLElement} modal
+     */
     trapFocusInModal(modal) {
-        const focusableElements = modal.querySelectorAll(
+        const focusableElements = /** @type {NodeListOf<HTMLElement>} */ (modal.querySelectorAll(
             'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        );
+        ));
         const firstElement = focusableElements[0];
         const lastElement = focusableElements[focusableElements.length - 1];
 

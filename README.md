@@ -36,18 +36,30 @@ A fully accessible, responsive memory card matching game built with vanilla Java
 ```
 memory-card-game/
 ├── index.html              # Main HTML file
-├── styles.css              # CSS with responsive design and animations
-├── main.js                 # Application entry point
-├── modules/
-│   ├── game.js             # Core game logic and state management
-│   ├── dom.js              # DOM rendering and manipulation
-│   ├── a11y.js             # Accessibility features and keyboard navigation
-│   └── storage.js          # LocalStorage management for scores
-├── utils/
-│   └── shuffle.js          # Fisher-Yates shuffle algorithm
+├── src/
+│   ├── styles.css          # CSS with responsive design and animations
+│   ├── main.js             # Application entry point
+│   ├── modules/
+│   │   ├── game.js         # Core game logic and state management
+│   │   ├── dom.js          # DOM rendering and manipulation
+│   │   ├── a11y.js         # Accessibility features and keyboard navigation
+│   │   └── storage.js      # LocalStorage management for scores
+│   └── utils/
+│       └── shuffle.js      # Fisher-Yates shuffle algorithm
 ├── assets/
 │   └── icons/
 │       └── icons.txt       # Card icon definitions
+├── tests/
+│   ├── game.test.js        # Tests for game logic
+│   └── shuffle.test.js     # Tests for shuffle algorithm
+├── .github/
+│   └── workflows/
+│       └── ci.yml          # GitHub Actions workflow
+├── .eslintrc.json          # ESLint configuration
+├── babel.config.cjs        # Babel configuration
+├── jest.config.cjs         # Jest configuration
+├── package.json            # NPM package configuration
+├── tsconfig.json           # TypeScript configuration
 ├── README.md               # This file
 └── project-scope.md        # Original project specification
 ```
@@ -74,15 +86,18 @@ memory-card-game/
 
 ## Getting Started
 
-### Option 1: Play Online
+### Play Online
 Visit the live demo: https://bosk8.github.io/memory-card-game/
 
-### Option 2: Run Locally
+### Run Locally
 1. **Clone the repository**: `git clone https://github.com/bosk8/memory-card-game.git`
-2. **Open** `index.html` in a modern web browser
-3. **Start playing** immediately - no build step required!
+2. **Install dependencies**: `npm install`
+3. **Open** `index.html` in a modern web browser
 
-The game works in any modern browser that supports ES6+ modules (Chrome 61+, Firefox 60+, Safari 10.1+, Edge 16+).
+### Development
+- **Run tests**: `npm test`
+- **Run linter**: `npm run lint`
+- **Run type checker**: `npm run typecheck`
 
 ## Performance Goals
 
