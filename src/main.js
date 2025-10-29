@@ -4,6 +4,11 @@ import { DOMRenderer } from './modules/dom.js';
 import { AccessibilityManager } from './modules/a11y.js';
 import { StorageManager } from './modules/storage.js';
 
+/**
+ * @typedef {import('./modules/game.js').Difficulty} Difficulty
+ * @typedef {import('./modules/game.js').GameState} GameState
+ */
+
 class MemoryGameApp {
     constructor() {
         this.game = new Game();
@@ -33,43 +38,53 @@ class MemoryGameApp {
 
     setupEventListeners() {
         // Difficulty selector
-        const difficultySelect = document.getElementById('difficulty');
-        difficultySelect.addEventListener('change', (e) => {
-            this.game.init(e.target.value);
-            this.renderer.renderBoard(this.game.getState());
-        });
+        const difficultySelect = /** @type {HTMLSelectElement} */ (document.getElementById('difficulty'));
+        if (difficultySelect) {
+            difficultySelect.addEventListener('change', (e) => {
+                this.game.init(/** @type {Difficulty} */ (/** @type {HTMLSelectElement} */ (e.target).value));
+                this.renderer.renderBoard(this.game.getState());
+            });
+        }
 
         // Restart button
         const restartBtn = document.getElementById('restart');
-        restartBtn.addEventListener('click', () => {
-            this.game.restart();
-            this.renderer.renderBoard(this.game.getState());
-        });
+        if (restartBtn) {
+            restartBtn.addEventListener('click', () => {
+                this.game.restart();
+                this.renderer.renderBoard(this.game.getState());
+            });
+        }
 
         // Pause button
         const pauseBtn = document.getElementById('pause');
-        pauseBtn.addEventListener('click', () => {
-            this.game.togglePause();
-            this.renderer.updatePauseButton(this.game.getState().isPaused);
-        });
+        if (pauseBtn) {
+            pauseBtn.addEventListener('click', () => {
+                this.game.togglePause();
+                this.renderer.updatePauseButton(this.game.getState().isPaused);
+            });
+        }
 
         // Play again button
         const playAgainBtn = document.getElementById('playAgain');
-        playAgainBtn.addEventListener('click', () => {
-            this.closeWinModal();
-            this.game.restart();
-            this.renderer.renderBoard(this.game.getState());
-        });
+        if (playAgainBtn) {
+            playAgainBtn.addEventListener('click', () => {
+                this.closeWinModal();
+                this.game.restart();
+                this.renderer.renderBoard(this.game.getState());
+            });
+        }
 
         // Card clicks (event delegation)
         const board = document.getElementById('board');
-        board.addEventListener('click', (e) => {
-            const card = e.target.closest('.card');
-            if (card && !this.game.getState().isLocked) {
-                const cardId = parseInt(card.dataset.id);
-                this.handleCardClick(cardId);
-            }
-        });
+        if (board) {
+            board.addEventListener('click', (e) => {
+                const card = /** @type {HTMLElement} */ (e.target).closest('.card');
+                if (card && !this.game.getState().isLocked) {
+                    const cardId = parseInt(/** @type {HTMLElement} */ (card).dataset.id || '');
+                    this.handleCardClick(cardId);
+                }
+            });
+        }
 
         // Keyboard support
         document.addEventListener('keydown', (e) => {
@@ -77,6 +92,9 @@ class MemoryGameApp {
         });
     }
 
+    /**
+     * @param {number} cardId
+     */
     handleCardClick(cardId) {
         const result = this.game.flipCard(cardId);
         
@@ -91,6 +109,9 @@ class MemoryGameApp {
         }
     }
 
+    /**
+     * @param {KeyboardEvent} e
+     */
     handleKeyboardInput(e) {
         switch (e.key.toLowerCase()) {
             case 'r':
@@ -104,14 +125,15 @@ class MemoryGameApp {
                 this.renderer.updatePauseButton(this.game.getState().isPaused);
                 break;
             case 'enter':
-            case ' ':
+            case ' ': {
                 e.preventDefault();
-                const focusedCard = document.activeElement.closest('.card');
+                const focusedCard = /** @type {HTMLElement} */ (document.activeElement).closest('.card');
                 if (focusedCard) {
-                    const cardId = parseInt(focusedCard.dataset.id);
+                    const cardId = parseInt(/** @type {HTMLElement} */ (focusedCard).dataset.id || '');
                     this.handleCardClick(cardId);
                 }
                 break;
+            }
         }
     }
 
@@ -128,25 +150,38 @@ class MemoryGameApp {
         this.a11y.announce(`Congratulations! You won in ${state.elapsedTime} seconds with a score of ${state.score}.`);
     }
 
+    /**
+     * @param {GameState} state
+     */
     showWinModal(state) {
         const modal = document.getElementById('winModal');
         const bestTime = this.storage.getBestTime(state.difficulty);
         
-        document.getElementById('finalTime').textContent = state.elapsedTime;
-        document.getElementById('finalScore').textContent = state.score;
-        document.getElementById('bestTime').textContent = bestTime || '--';
+        const finalTime = document.getElementById('finalTime');
+        if (finalTime) finalTime.textContent = String(state.elapsedTime);
+        const finalScore = document.getElementById('finalScore');
+        if (finalScore) finalScore.textContent = String(state.score);
+        const bestTimeElement = document.getElementById('bestTime');
+        if (bestTimeElement) bestTimeElement.textContent = bestTime ? String(bestTime) : '--';
         
-        modal.setAttribute('aria-hidden', 'false');
-        modal.style.display = 'flex';
+        if (modal) {
+            modal.setAttribute('aria-hidden', 'false');
+            modal.style.display = 'flex';
+        }
         
         // Focus on play again button
-        document.getElementById('playAgain').focus();
+        const playAgainButton = /** @type {HTMLButtonElement} */ (document.getElementById('playAgain'));
+        if (playAgainButton) {
+            playAgainButton.focus();
+        }
     }
 
     closeWinModal() {
         const modal = document.getElementById('winModal');
-        modal.setAttribute('aria-hidden', 'true');
-        modal.style.display = 'none';
+        if (modal) {
+            modal.setAttribute('aria-hidden', 'true');
+            modal.style.display = 'none';
+        }
     }
 }
 

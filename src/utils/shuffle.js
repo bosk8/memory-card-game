@@ -1,4 +1,9 @@
-// Fisher-Yates Shuffle Algorithm
+/**
+ * Shuffles an array using the Fisher-Yates algorithm.
+ * @template T
+ * @param {T[]} array The array to shuffle.
+ * @returns {T[]} The shuffled array.
+ */
 export function shuffleArray(array) {
     const shuffled = [...array];
     
@@ -10,7 +15,13 @@ export function shuffleArray(array) {
     return shuffled;
 }
 
-// Test function for shuffle distribution (for development)
+/**
+ * Tests the distribution of the shuffle algorithm.
+ * @template T
+ * @param {T[]} array The array to test.
+ * @param {number} iterations The number of iterations to run.
+ * @returns {Map<number, Map<T, number>>[]} An array of maps containing the distribution of each element at each position.
+ */
 export function testShuffleDistribution(array, iterations = 1000) {
     const positionCounts = array.map(() => new Map());
     
