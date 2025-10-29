@@ -27,21 +27,24 @@ A fully accessible, responsive memory card matching game built with vanilla Java
 - **P**: Pause/Resume game
 - **Tab**: Navigate through controls
 
+## 🎮 Live Demo
+
+**Play the game online**: https://bosk8.github.io/memory-card-game/
+
 ## Project Structure
 
 ```
 memory-card-game/
-├── src/
-│   ├── index.html          # Main HTML file
-│   ├── styles.css          # CSS with responsive design and animations
-│   ├── main.js             # Application entry point
-│   ├── modules/
-│   │   ├── game.js         # Core game logic and state management
-│   │   ├── dom.js          # DOM rendering and manipulation
-│   │   ├── a11y.js         # Accessibility features and keyboard navigation
-│   │   └── storage.js      # LocalStorage management for scores
-│   └── utils/
-│       └── shuffle.js      # Fisher-Yates shuffle algorithm
+├── index.html              # Main HTML file
+├── styles.css              # CSS with responsive design and animations
+├── main.js                 # Application entry point
+├── modules/
+│   ├── game.js             # Core game logic and state management
+│   ├── dom.js              # DOM rendering and manipulation
+│   ├── a11y.js             # Accessibility features and keyboard navigation
+│   └── storage.js          # LocalStorage management for scores
+├── utils/
+│   └── shuffle.js          # Fisher-Yates shuffle algorithm
 ├── assets/
 │   └── icons/
 │       └── icons.txt       # Card icon definitions
@@ -71,8 +74,13 @@ memory-card-game/
 
 ## Getting Started
 
-1. **Open** `src/index.html` in a modern web browser
-2. **Start playing** immediately - no build step required!
+### Option 1: Play Online
+Visit the live demo: https://bosk8.github.io/memory-card-game/
+
+### Option 2: Run Locally
+1. **Clone the repository**: `git clone https://github.com/bosk8/memory-card-game.git`
+2. **Open** `index.html` in a modern web browser
+3. **Start playing** immediately - no build step required!
 
 The game works in any modern browser that supports ES6+ modules (Chrome 61+, Firefox 60+, Safari 10.1+, Edge 16+).
 
