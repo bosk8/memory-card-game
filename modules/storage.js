@@ -20,7 +20,7 @@ export class StorageManager {
             }
 
             const scores = JSON.parse(stored);
-            
+
             // Check schema version and migrate if needed
             if (!scores.version || scores.version !== this.schemaVersion) {
                 scores.version = this.schemaVersion;
@@ -52,7 +52,7 @@ export class StorageManager {
 
         // Check if this is a better time (lower is better)
         const isBetterTime = !currentBest.time || time < currentBest.time;
-        
+
         // Check if this is a better score (higher is better)
         const isBetterScore = score > currentBest.score;
 
@@ -113,7 +113,7 @@ export class StorageManager {
     importScores(jsonData) {
         try {
             const importData = JSON.parse(jsonData);
-            
+
             // Validate structure
             if (!importData.scores || typeof importData.scores !== 'object') {
                 throw new Error('Invalid scores data structure');
@@ -153,12 +153,12 @@ export class StorageManager {
         try {
             const scores = this.loadBestScores();
             const dataSize = JSON.stringify(scores).length;
-            
+
             return {
                 available: this.isStorageAvailable(),
                 dataSize: dataSize,
                 quota: this.getStorageQuota(),
-                usage: (dataSize / this.getStorageQuota() * 100).toFixed(2) + '%'
+                usage: ((dataSize / this.getStorageQuota()) * 100).toFixed(2) + '%'
             };
         } catch (error) {
             return {
@@ -178,11 +178,11 @@ export class StorageManager {
     // Migration helpers for future schema changes
     migrateScores(fromVersion, toVersion) {
         const scores = this.loadBestScores();
-        
+
         // Example migration logic (can be expanded for future versions)
         if (fromVersion === '1.0' && toVersion === '1.1') {
             // Add new fields, transform existing data, etc.
-            console.log('Migrating scores from version 1.0 to 1.1');
+            console.warn('Migrating scores from version 1.0 to 1.1');
         }
 
         scores.version = toVersion;
@@ -192,10 +192,10 @@ export class StorageManager {
     // Validate score data integrity
     validateScores(scores) {
         const requiredDifficulties = ['easy', 'medium', 'hard'];
-        
+
         for (const difficulty of requiredDifficulties) {
             const score = scores[difficulty];
-            
+
             if (!score || typeof score !== 'object') {
                 return false;
             }

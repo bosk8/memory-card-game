@@ -11,12 +11,12 @@ export class DOMRenderer {
     renderBoard(state) {
         this.clearBoard();
         this.updateBoardClass(state.difficulty);
-        
-        state.deck.forEach(card => {
+
+        state.deck.forEach((card) => {
             const cardElement = this.createCardElement(card, state);
             this.board.appendChild(cardElement);
         });
-        
+
         this.updateStats(state);
     }
 
@@ -36,22 +36,22 @@ export class DOMRenderer {
         cardEl.setAttribute('aria-pressed', 'false');
         cardEl.setAttribute('aria-label', `Card ${card.id + 1} of ${state.deck.length}`);
         cardEl.setAttribute('tabindex', '0');
-        
+
         // Card front (question mark)
         const front = document.createElement('span');
         front.className = 'card-front';
         front.setAttribute('aria-hidden', 'true');
         front.textContent = '?';
-        
+
         // Card back (icon)
         const back = document.createElement('span');
         back.className = 'card-back';
         back.setAttribute('aria-hidden', 'true');
         back.textContent = card.icon;
-        
+
         cardEl.appendChild(front);
         cardEl.appendChild(back);
-        
+
         return cardEl;
     }
 
@@ -59,7 +59,7 @@ export class DOMRenderer {
         const cardElement = this.board.querySelector(`[data-id="${cardId}"]`);
         if (!cardElement) return;
 
-        const card = state.deck.find(c => c.id === cardId);
+        const card = state.deck.find((c) => c.id === cardId);
         const isFlipped = state.flipped.includes(cardId);
         const isMatched = state.matched.has(cardId);
 
@@ -126,9 +126,9 @@ export class DOMRenderer {
             return Promise.resolve();
         }
 
-        return new Promise(resolve => {
+        return new Promise((resolve) => {
             cardElement.classList.toggle('flipped', isFlipped);
-            
+
             // Wait for animation to complete
             setTimeout(resolve, 400);
         });
@@ -154,7 +154,7 @@ export class DOMRenderer {
         const cards = Array.from(this.board.querySelectorAll('.card'));
         const index = cards.indexOf(cardElement);
         const config = this.getCurrentGridConfig();
-        
+
         return {
             index,
             row: Math.floor(index / config.cols),

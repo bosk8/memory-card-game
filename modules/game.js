@@ -17,7 +17,7 @@ export class Game {
             isWon: false,
             isLocked: false
         };
-        
+
         this.timerInterval = null;
         this.iconSets = {
             easy: ['🍎', '🍊', '🍌', '🍇', '🍓', '🥝'],
@@ -39,20 +39,20 @@ export class Game {
         this.state.isPaused = false;
         this.state.isWon = false;
         this.state.isLocked = false;
-        
+
         this.stopTimer();
     }
 
     createDeck() {
         const icons = this.iconSets[this.state.difficulty];
         const deck = [];
-        
+
         // Create pairs
         icons.forEach((icon, index) => {
             deck.push({ id: index * 2, icon, matched: false });
             deck.push({ id: index * 2 + 1, icon, matched: false });
         });
-        
+
         // Shuffle the deck
         return shuffleArray(deck);
     }
@@ -62,7 +62,7 @@ export class Game {
             return false;
         }
 
-        const card = this.state.deck.find(c => c.id === cardId);
+        const card = this.state.deck.find((c) => c.id === cardId);
         if (!card || card.matched || this.state.flipped.includes(cardId)) {
             return false;
         }
@@ -78,7 +78,7 @@ export class Game {
         if (this.state.flipped.length === 2) {
             this.state.moves++;
             this.state.isLocked = true;
-            
+
             setTimeout(() => {
                 this.checkMatch();
                 this.state.isLocked = false;
@@ -90,8 +90,8 @@ export class Game {
 
     checkMatch() {
         const [card1Id, card2Id] = this.state.flipped;
-        const card1 = this.state.deck.find(c => c.id === card1Id);
-        const card2 = this.state.deck.find(c => c.id === card2Id);
+        const card1 = this.state.deck.find((c) => c.id === card1Id);
+        const card2 = this.state.deck.find((c) => c.id === card2Id);
 
         if (card1.icon === card2.icon) {
             // Match found
@@ -99,17 +99,17 @@ export class Game {
             card2.matched = true;
             this.state.matched.add(card1Id);
             this.state.matched.add(card2Id);
-            
+
             // Update score
             this.state.score += 10;
             this.state.streakCount++;
-            
+
             // Streak bonus
             if (this.state.streakCount >= 3) {
                 this.state.score += 5;
                 this.state.streakCount = 0;
             }
-            
+
             // Check win condition
             if (this.state.matched.size === this.state.deck.length) {
                 this.state.isWon = true;
@@ -142,12 +142,12 @@ export class Game {
 
     togglePause() {
         this.state.isPaused = !this.state.isPaused;
-        
+
         if (this.state.isPaused) {
             this.stopTimer();
         } else if (this.state.startTime !== null) {
             // Resume timer
-            this.state.startTime = Date.now() - (this.state.elapsedTime * 1000);
+            this.state.startTime = Date.now() - this.state.elapsedTime * 1000;
             this.startTimer();
         }
     }
@@ -162,7 +162,7 @@ export class Game {
     }
 
     getCardById(cardId) {
-        return this.state.deck.find(c => c.id === cardId);
+        return this.state.deck.find((c) => c.id === cardId);
     }
 
     getDifficultyConfig() {
