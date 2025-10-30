@@ -14,7 +14,7 @@ export class AccessibilityManager {
     setupKeyboardNavigation() {
         document.addEventListener('keydown', (e) => {
             const activeElement = document.activeElement;
-            
+
             // Handle arrow key navigation for cards
             if (activeElement.classList.contains('card')) {
                 if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
@@ -29,10 +29,10 @@ export class AccessibilityManager {
         const board = document.getElementById('board');
         const cards = Array.from(board.querySelectorAll('.card'));
         const currentIndex = cards.indexOf(currentCard);
-        
+
         let newIndex = currentIndex;
         const config = this.getGridConfig(board);
-        
+
         switch (direction) {
             case 'ArrowUp':
                 newIndex = Math.max(0, currentIndex - config.cols);
@@ -47,7 +47,7 @@ export class AccessibilityManager {
                 newIndex = Math.min(cards.length - 1, currentIndex + 1);
                 break;
         }
-        
+
         if (newIndex !== currentIndex && cards[newIndex]) {
             cards[newIndex].focus();
         }
@@ -67,9 +67,11 @@ export class AccessibilityManager {
     setupFocusManagement() {
         // Track focus changes
         document.addEventListener('focusin', (e) => {
-            if (e.target.classList.contains('card') || 
+            if (
+                e.target.classList.contains('card') ||
                 e.target.classList.contains('controls') ||
-                e.target.closest('.controls')) {
+                e.target.closest('.controls')
+            ) {
                 this.lastFocusedElement = e.target;
             }
         });
@@ -89,7 +91,7 @@ export class AccessibilityManager {
         const modal = document.getElementById('winModal');
         modal.setAttribute('aria-hidden', 'true');
         modal.style.display = 'none';
-        
+
         // Restore focus to last focused element or first card
         if (this.lastFocusedElement && this.lastFocusedElement.classList.contains('card')) {
             this.lastFocusedElement.focus();
@@ -104,7 +106,7 @@ export class AccessibilityManager {
     setupMotionPreferences() {
         // Check for reduced motion preference
         const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        
+
         if (prefersReducedMotion) {
             document.body.classList.add('reduced-motion');
         }
@@ -124,10 +126,10 @@ export class AccessibilityManager {
 
         // Clear previous announcements
         this.announcementsElement.textContent = '';
-        
+
         // Set priority
         this.announcementsElement.setAttribute('aria-live', priority);
-        
+
         // Add new announcement
         setTimeout(() => {
             this.announcementsElement.textContent = message;
@@ -171,12 +173,12 @@ export class AccessibilityManager {
     // ARIA label helpers
     updateCardAriaLabel(cardElement, state) {
         const cardId = parseInt(cardElement.dataset.id);
-        const card = state.deck.find(c => c.id === cardId);
+        const card = state.deck.find((c) => c.id === cardId);
         const isFlipped = state.flipped.includes(cardId);
         const isMatched = state.matched.has(cardId);
 
         let label = `Card ${cardId + 1} of ${state.deck.length}`;
-        
+
         if (isMatched) {
             label += ', matched';
         } else if (isFlipped) {

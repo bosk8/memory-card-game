@@ -10,23 +10,23 @@ class MemoryGameApp {
         this.renderer = new DOMRenderer();
         this.a11y = new AccessibilityManager();
         this.storage = new StorageManager();
-        
+
         this.init();
     }
 
     init() {
         // Initialize game with default difficulty
         this.game.init('medium');
-        
+
         // Set up event listeners
         this.setupEventListeners();
-        
+
         // Render initial board
         this.renderer.renderBoard(this.game.getState());
-        
+
         // Initialize accessibility features
         this.a11y.init();
-        
+
         // Load best scores
         this.storage.loadBestScores();
     }
@@ -79,11 +79,11 @@ class MemoryGameApp {
 
     handleCardClick(cardId) {
         const result = this.game.flipCard(cardId);
-        
+
         if (result) {
             this.renderer.updateCard(cardId, this.game.getState());
             this.renderer.updateStats(this.game.getState());
-            
+
             // Check for win condition
             if (this.game.getState().isWon) {
                 this.handleWin();
@@ -117,13 +117,13 @@ class MemoryGameApp {
 
     handleWin() {
         const state = this.game.getState();
-        
+
         // Save best score if applicable
         this.storage.saveScore(state.difficulty, state.elapsedTime, state.score);
-        
+
         // Show win modal
         this.showWinModal(state);
-        
+
         // Announce win to screen readers
         this.a11y.announce(`Congratulations! You won in ${state.elapsedTime} seconds with a score of ${state.score}.`);
     }
@@ -131,14 +131,14 @@ class MemoryGameApp {
     showWinModal(state) {
         const modal = document.getElementById('winModal');
         const bestTime = this.storage.getBestTime(state.difficulty);
-        
+
         document.getElementById('finalTime').textContent = state.elapsedTime;
         document.getElementById('finalScore').textContent = state.score;
         document.getElementById('bestTime').textContent = bestTime || '--';
-        
+
         modal.setAttribute('aria-hidden', 'false');
         modal.style.display = 'flex';
-        
+
         // Focus on play again button
         document.getElementById('playAgain').focus();
     }
