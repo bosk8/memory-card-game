@@ -3,15 +3,15 @@
     "version": "1.0.0",
     "description": "A fully accessible, responsive memory card matching game built with vanilla JavaScript ES6+ modules",
     "type": "module",
-    "main": "main.js",
+    "main": "src/main.js",
     "scripts": {
-        "lint": "eslint . --ext .js",
-        "lint:fix": "eslint . --ext .js --fix",
+        "lint": "eslint src tests --ext .js --config config/eslint.config.js",
+        "lint:fix": "eslint src tests --ext .js --fix --config config/eslint.config.js",
         "format": "prettier --write \"**/*.{js,html,css,json,md}\"",
         "format:check": "prettier --check \"**/*.{js,html,css,json,md}\"",
-        "test": "vitest run",
-        "test:watch": "vitest",
-        "test:coverage": "vitest run --coverage",
+        "test": "vitest run --config config/vitest.config.js",
+        "test:watch": "vitest --config config/vitest.config.js",
+        "test:coverage": "vitest run --coverage --config config/vitest.config.js",
         "validate": "npm run lint && npm run format:check && npm run test"
     },
     "keywords": [

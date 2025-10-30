@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { shuffleArray, testShuffleDistribution } from './utils/shuffle.js';
+import { shuffleArray, testShuffleDistribution } from '../src/utils/shuffle.js';
 
 describe('Shuffle Utility', () => {
     describe('shuffleArray', () => {

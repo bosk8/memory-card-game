@@ -96,7 +96,7 @@ main.bosk8 {
 /* Header */
 header {
     text-align: center;
-    margin-bottom: 30px;
+    margin-bottom: var(--space-2);
 }
 
 .tagline {
@@ -112,7 +112,7 @@ header {
 .stats {
     display: flex;
     justify-content: center;
-    gap: 30px;
+    gap: var(--space-1_5);
     flex-wrap: wrap;
 }
 
@@ -128,8 +128,8 @@ header {
 .controls {
     display: flex;
     justify-content: center;
-    gap: 15px;
-    margin-bottom: 30px;
+    gap: var(--space-1);
+    margin-bottom: var(--space-2);
     flex-wrap: wrap;
 }
 
@@ -139,8 +139,11 @@ header {
     border: var(--border-w) solid var(--border-color);
     border-radius: var(--r-md);
     font-size: 1rem;
+    font-family: var(--font-ui);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.15s ease;
     background: var(--surface-card);
     color: var(--text-muted);
 }
@@ -209,8 +212,8 @@ header {
     grid-template-rows: repeat(4, 1fr);
 }
 
-/* Card Styles */
-.card {
+/* Card Button Styles - Note: selector specificity needed due to .card container class */
+button.card {
     width: 80px;
     height: 80px;
     border: none;
@@ -218,32 +221,34 @@ header {
     cursor: pointer;
     position: relative;
     perspective: 1000px;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 2rem;
+    background-color: var(--surface-card);
     color: var(--text-primary);
+    font-family: var(--font-ui);
 }
 
-.card:hover {
+button.card:hover {
     transform: translateY(-2px);
 }
 
-.card:focus-visible {
+button.card:focus-visible {
     outline: 2px solid var(--border-color);
     outline-offset: 2px;
 }
 
-.card:active {
+button.card:active {
     transform: translateY(0);
 }
 
-.card.flipped {
+button.card.flipped {
     transform: rotateY(180deg);
 }
 
-.card.matched {
+button.card.matched {
     opacity: 0.8;
 }
 
@@ -256,7 +261,7 @@ header {
     align-items: center;
     justify-content: center;
     backface-visibility: hidden;
-    border-radius: 12px;
+    border-radius: var(--r-md);
 }
 
 .card-front {
@@ -272,16 +277,16 @@ header {
 
 /* Motion Reduction Support */
 @media (prefers-reduced-motion: reduce) {
-    .card {
+    button.card {
         transition: none;
         transform: none !important;
     }
 
-    .card.flipped {
+    button.card.flipped {
         transform: none !important;
     }
 
-    .card:hover {
+    button.card:hover {
         transform: none !important;
     }
 }
@@ -320,23 +325,31 @@ header {
     color: var(--text-subtle);
 }
 
-.modal-content button {
+.modal-content button,
+.copy-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-0_75);
     background: transparent;
-    color: var(--text-muted);
     border: none;
     padding: var(--space-0_75) var(--space-1);
-    border-radius: var(--r-md);
+    color: var(--text-muted);
+    font-family: var(--font-ui);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
     font-size: 1rem;
     cursor: pointer;
     margin-top: var(--space-1);
-    transition: color 0.2s ease;
+    transition: color 0.15s ease;
 }
 
-.modal-content button:hover {
+.modal-content button:hover,
+.copy-btn:hover {
     color: var(--text-primary);
 }
 
-.modal-content button:focus-visible {
+.modal-content button:focus-visible,
+.copy-btn:focus-visible {
     outline: 2px solid var(--border-color);
     outline-offset: 2px;
 }
@@ -358,87 +371,89 @@ header {
 @media (max-width: 768px) {
     .game {
         padding: var(--space-1);
-        margin: 10px;
+        margin: var(--space-1);
     }
 
-    header h1 {
-        font-size: 2rem;
+    .tagline {
+        font-size: 1rem;
     }
 
     .stats {
-        gap: 15px;
+        gap: var(--space-1);
     }
 
     .stats span {
-        padding: 8px 15px;
-        font-size: 0.9rem;
+        padding: var(--space-0_5) var(--space-1);
+        font-size: 0.75rem;
     }
 
-    .card {
+    button.card {
         width: 60px;
         height: 60px;
         font-size: 1.5rem;
     }
 
     .board {
-        gap: 10px;
+        gap: var(--space-1);
     }
 
     .controls {
-        gap: 10px;
+        gap: var(--space-1);
     }
 
     .controls select,
     .controls button {
-        padding: 10px 15px;
-        font-size: 0.9rem;
+        padding: var(--space-0_75) var(--space-1);
+        font-size: 0.875rem;
     }
 }
 
 @media (max-width: 480px) {
     .game {
-        padding: 15px;
+        padding: var(--space-1_5);
     }
 
-    header h1 {
-        font-size: 1.8rem;
+    .tagline {
+        font-size: 1rem;
     }
 
-    .card {
+    button.card {
         width: 50px;
         height: 50px;
         font-size: 1.2rem;
     }
 
     .board {
-        gap: 8px;
+        gap: var(--space-1);
     }
 
     .modal-content {
-        padding: 30px 20px;
+        padding: var(--space-2) var(--space-1_5);
     }
 
-    .modal-content h2 {
-        font-size: 1.8rem;
+    .modal-content .tagline {
+        font-size: 1rem;
     }
 
     .modal-content p {
-        font-size: 1.1rem;
+        font-size: 0.875rem;
     }
 }
 
 /* High contrast mode support */
 @media (prefers-contrast: high) {
-    .card {
-        border: 2px solid #000;
+    button.card {
+        border: var(--border-outer-w) solid var(--bg-black);
     }
 
-    .card:focus {
-        box-shadow: 0 0 0 3px #000;
+    button.card:focus-visible {
+        outline: 3px solid var(--bg-black);
+        outline-offset: 2px;
     }
 
-    .controls select:focus,
-    .controls button:focus {
-        box-shadow: 0 0 0 3px #000;
+    .controls select:focus-visible,
+    .controls button:focus-visible {
+        outline: 3px solid var(--bg-black);
+        outline-offset: 2px;
     }
 }

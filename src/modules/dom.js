@@ -86,7 +86,7 @@ export class DOMRenderer {
     }
 
     updatePauseButton(isPaused) {
-        this.pauseButton.textContent = isPaused ? 'Resume' : 'Pause';
+        this.pauseButton.textContent = isPaused ? 'RESUME' : 'PAUSE';
         this.pauseButton.setAttribute('aria-label', isPaused ? 'Resume Game' : 'Pause Game');
     }
 
@@ -143,7 +143,7 @@ export class DOMRenderer {
     }
 
     focusFirstCard() {
-        const firstCard = this.board.querySelector('.card');
+        const firstCard = this.board.querySelector('button.card');
         if (firstCard) {
             firstCard.focus();
         }
@@ -151,7 +151,7 @@ export class DOMRenderer {
 
     // Keyboard navigation helpers
     getCardPosition(cardElement) {
-        const cards = Array.from(this.board.querySelectorAll('.card'));
+        const cards = Array.from(this.board.querySelectorAll('button.card'));
         const index = cards.indexOf(cardElement);
         const config = this.getCurrentGridConfig();
 
@@ -195,7 +195,7 @@ export class DOMRenderer {
         }
 
         const newIndex = newRow * config.cols + newCol;
-        const cards = Array.from(this.board.querySelectorAll('.card'));
+        const cards = Array.from(this.board.querySelectorAll('button.card'));
         const targetCard = cards[newIndex];
 
         if (targetCard) {

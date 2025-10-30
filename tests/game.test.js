@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { Game } from './modules/game.js';
+import { Game } from '../src/modules/game.js';
 
 describe('Game', () => {
     let game;

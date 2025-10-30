@@ -16,7 +16,7 @@ export class AccessibilityManager {
             const activeElement = document.activeElement;
 
             // Handle arrow key navigation for cards
-            if (activeElement.classList.contains('card')) {
+            if (activeElement.classList.contains('card') && activeElement.tagName === 'BUTTON') {
                 if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
                     e.preventDefault();
                     this.handleArrowNavigation(e.key, activeElement);
@@ -27,7 +27,7 @@ export class AccessibilityManager {
 
     handleArrowNavigation(direction, currentCard) {
         const board = document.getElementById('board');
-        const cards = Array.from(board.querySelectorAll('.card'));
+        const cards = Array.from(board.querySelectorAll('button.card'));
         const currentIndex = cards.indexOf(currentCard);
 
         let newIndex = currentIndex;
@@ -68,7 +68,7 @@ export class AccessibilityManager {
         // Track focus changes
         document.addEventListener('focusin', (e) => {
             if (
-                e.target.classList.contains('card') ||
+                (e.target.classList.contains('card') && e.target.tagName === 'BUTTON') ||
                 e.target.classList.contains('controls') ||
                 e.target.closest('.controls')
             ) {
@@ -93,10 +93,10 @@ export class AccessibilityManager {
         modal.style.display = 'none';
 
         // Restore focus to last focused element or first card
-        if (this.lastFocusedElement && this.lastFocusedElement.classList.contains('card')) {
+        if (this.lastFocusedElement && this.lastFocusedElement.classList.contains('card') && this.lastFocusedElement.tagName === 'BUTTON') {
             this.lastFocusedElement.focus();
         } else {
-            const firstCard = document.querySelector('.card');
+            const firstCard = document.querySelector('#board button.card');
             if (firstCard) {
                 firstCard.focus();
             }
@@ -210,7 +210,7 @@ export class AccessibilityManager {
 
     // Focus helpers
     focusFirstInteractiveElement() {
-        const firstCard = document.querySelector('.card');
+        const firstCard = document.querySelector('#board button.card');
         if (firstCard) {
             firstCard.focus();
         } else {

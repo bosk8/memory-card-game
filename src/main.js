@@ -27,8 +27,8 @@ class MemoryGameApp {
         // Initialize accessibility features
         this.a11y.init();
 
-        // Load best scores
-        this.storage.loadBestScores();
+        // Load best scores and render panel
+        this.initBestScoresPanel();
     }
 
     setupEventListeners() {
@@ -64,10 +64,12 @@ class MemoryGameApp {
         // Card clicks (event delegation)
         const board = document.getElementById('board');
         board.addEventListener('click', (e) => {
-            const card = e.target.closest('.card');
-            if (card && !this.game.getState().isLocked) {
+            const card = e.target.closest('button.card');
+            if (card && card.dataset.id && !this.game.getState().isLocked) {
                 const cardId = parseInt(card.dataset.id);
-                this.handleCardClick(cardId);
+                if (!isNaN(cardId)) {
+                    this.handleCardClick(cardId);
+                }
             }
         });
 
@@ -75,6 +77,16 @@ class MemoryGameApp {
         document.addEventListener('keydown', (e) => {
             this.handleKeyboardInput(e);
         });
+
+        // Modal Escape key handler
+        const modal = document.getElementById('winModal');
+        if (modal) {
+            modal.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    this.closeWinModal();
+                }
+            });
+        }
     }
 
     handleCardClick(cardId) {
@@ -83,6 +95,27 @@ class MemoryGameApp {
         if (result) {
             this.renderer.updateCard(cardId, this.game.getState());
             this.renderer.updateStats(this.game.getState());
+
+            const state = this.game.getState();
+            
+            // If two cards are flipped, update UI after match check completes
+            if (state.flipped.length === 2) {
+                // Capture flipped card IDs before they're cleared
+                const flippedIds = [...state.flipped];
+                
+                setTimeout(() => {
+                    // Update all cards and stats after match check
+                    flippedIds.forEach(id => {
+                        this.renderer.updateCard(id, this.game.getState());
+                    });
+                    this.renderer.updateStats(this.game.getState());
+
+                    // Check for win condition after match check
+                    if (this.game.getState().isWon) {
+                        this.handleWin();
+                    }
+                }, 800);
+            }
 
             // Check for win condition
             if (this.game.getState().isWon) {
@@ -106,10 +139,12 @@ class MemoryGameApp {
             case 'enter':
             case ' ':
                 e.preventDefault();
-                const focusedCard = document.activeElement.closest('.card');
-                if (focusedCard) {
+                const focusedCard = document.activeElement.closest('button.card');
+                if (focusedCard && focusedCard.dataset.id) {
                     const cardId = parseInt(focusedCard.dataset.id);
-                    this.handleCardClick(cardId);
+                    if (!isNaN(cardId)) {
+                        this.handleCardClick(cardId);
+                    }
                 }
                 break;
         }
@@ -120,6 +155,7 @@ class MemoryGameApp {
 
         // Save best score if applicable
         this.storage.saveScore(state.difficulty, state.elapsedTime, state.score);
+        this.renderBestScoresPanel();
 
         // Show win modal
         this.showWinModal(state);
@@ -147,6 +183,38 @@ class MemoryGameApp {
         const modal = document.getElementById('winModal');
         modal.setAttribute('aria-hidden', 'true');
         modal.style.display = 'none';
+    }
+
+    // Best Scores panel
+    initBestScoresPanel() {
+        const noticeEl = document.getElementById('storageNotice');
+        if (!this.storage.isStorageAvailable()) {
+            if (noticeEl) {
+                noticeEl.hidden = false;
+                noticeEl.textContent = 'Storage unavailable. Best scores will not be saved.';
+            }
+            return;
+        }
+        // Ensure scores exist and render
+        this.storage.loadBestScores();
+        this.renderBestScoresPanel();
+    }
+
+    renderBestScoresPanel() {
+        const scores = this.storage.getAllScores();
+        const easy = document.getElementById('bestEasy');
+        const medium = document.getElementById('bestMedium');
+        const hard = document.getElementById('bestHard');
+        if (easy && medium && hard) {
+            easy.textContent = this.formatScore(scores.easy);
+            medium.textContent = this.formatScore(scores.medium);
+            hard.textContent = this.formatScore(scores.hard);
+        }
+    }
+
+    formatScore(entry) {
+        if (!entry || entry.time === null) return '--';
+        return `${entry.time}s / ${entry.score}`;
     }
 }
 

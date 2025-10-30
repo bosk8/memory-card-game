@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { StorageManager } from './modules/storage.js';
+import { StorageManager } from '../src/modules/storage.js';
 
 describe('StorageManager', () => {
     let storage;

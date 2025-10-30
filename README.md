@@ -35,29 +35,38 @@ A fully accessible, responsive memory card matching game built with vanilla Java
 
 ```
 memory-card-game/
-├── index.html              # Main HTML file
-├── styles.css              # CSS with responsive design and animations
-├── main.js                 # Application entry point
-├── modules/
-│   ├── game.js             # Core game logic and state management
-│   ├── dom.js              # DOM rendering and manipulation
-│   ├── a11y.js             # Accessibility features and keyboard navigation
-│   └── storage.js          # LocalStorage management for scores
-├── utils/
-│   └── shuffle.js          # Fisher-Yates shuffle algorithm
-├── assets/
+├── index.html              # Main HTML file (entry point)
+├── src/                    # Source code
+│   ├── main.js             # Application entry point
+│   ├── styles.css           # CSS with responsive design and animations
+│   ├── modules/             # Game modules
+│   │   ├── game.js          # Core game logic and state management
+│   │   ├── dom.js           # DOM rendering and manipulation
+│   │   ├── a11y.js          # Accessibility features and keyboard navigation
+│   │   └── storage.js       # LocalStorage management for scores
+│   └── utils/               # Utility functions
+│       └── shuffle.js       # Fisher-Yates shuffle algorithm
+├── tests/                   # Test files
+│   ├── game.test.js         # Game logic tests
+│   ├── storage.test.js      # Storage tests
+│   └── shuffle.test.js      # Shuffle utility tests
+├── config/                  # Configuration files
+│   ├── eslint.config.js     # ESLint configuration
+│   └── vitest.config.js      # Vitest test configuration
+├── docs/                    # Documentation
+│   ├── DESIGN_SYSTEM.md     # Complete UI/UX design system specification
+│   ├── IMPLEMENTATION_COMPLETE.md  # Implementation completion report
+│   ├── IMPLEMENTATION_GUIDE.md     # Quick reference guide
+│   ├── SANITY_CHECK_COMPLETE.md    # Final sanity check report
+│   ├── UI_UX_SUMMARY.md     # UI/UX overview
+│   └── project-scope.md     # Original project specification
+├── assets/                  # Static assets
 │   └── icons/
-│       └── icons.txt       # Card icon definitions
-├── README.md               # This file
-├── project-scope.md        # Original project specification
-├── package.json            # NPM configuration and scripts
-├── eslint.config.js        # ESLint configuration
-├── .prettierrc             # Prettier configuration
-├── vitest.config.js        # Vitest test configuration
-├── .gitignore              # Git ignore rules
-└── .github/
-    └── workflows/
-        └── ci.yml          # GitHub Actions CI workflow
+│       └── icons.txt        # Card icon definitions
+├── README.md                # This file
+├── package.json             # NPM configuration and scripts
+├── .prettierrc              # Prettier configuration
+└── .gitignore               # Git ignore rules
 ```
 
 ## Technical Details
@@ -128,7 +137,7 @@ Visit the live demo: https://bosk8.github.io/memory-card-game/
 
 ## Testing
 
-The project uses [Vitest](https://vitest.dev/) for testing. Test files are located alongside their modules with `.test.js` extension.
+The project uses [Vitest](https://vitest.dev/) for testing. Test files are located in the `tests/` directory.
 
 ### Running Tests
 
@@ -173,12 +182,14 @@ Contributions are welcome! Please follow these guidelines:
 
 When adding new features:
 
-- **Game logic** → `modules/game.js`
-- **DOM manipulation** → `modules/dom.js`
-- **Accessibility** → `modules/a11y.js`
-- **Storage** → `modules/storage.js`
-- **Utilities** → `utils/`
-- **Tests** → `*.test.js` alongside source files
+- **Game logic** → `src/modules/game.js`
+- **DOM manipulation** → `src/modules/dom.js`
+- **Accessibility** → `src/modules/a11y.js`
+- **Storage** → `src/modules/storage.js`
+- **Utilities** → `src/utils/`
+- **Tests** → `tests/` directory
+- **Documentation** → `docs/` directory
+- **Configuration** → `config/` directory
 
 ## Performance Goals
 
