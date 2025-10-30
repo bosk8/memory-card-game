@@ -2,31 +2,34 @@
 # Memory Card Game — 8-Step Project Scope
 
 ## 1) Define Specifications
+
 - **Goal**: Flip cards to match pairs. Win when all pairs are matched.
 - **Modes**: Easy (4×3 = 12 cards), Medium (4×4 = 16 cards), Hard (6×4 = 24 cards).
 - **Scoring**: +10 points per match, −2 points per mismatch, bonus multiplier for consecutive matches (e.g., +5 every 3rd match), elapsed time tracking.
 - **UX Features**: Keyboard support (Enter/Space to flip, R to restart, P to pause), difficulty selector before game start, restart button, pause/resume toggle.
 - **Acceptance Criteria**:
-  - Written ruleset document provided.
-  - Game rules enforced consistently across all difficulties.
-  - Win condition triggers modal showing final stats (time, score, best time).
+    - Written ruleset document provided.
+    - Game rules enforced consistently across all difficulties.
+    - Win condition triggers modal showing final stats (time, score, best time).
 
 ## 2) Scaffold Project Structure
 ```
+
 /memory-game
 ├── /src
-│   ├── index.html
-│   ├── styles.css
-│   ├── main.js                 // entry point, app initialization
-│   ├── modules/
-│   │   ├── game.js             // game state + core logic
-│   │   ├── dom.js              // rendering + event delegation
-│   │   ├── a11y.js             // accessibility: focus, ARIA labels
-│   │   └── storage.js          // localStorage save/load for best scores
-│   └── utils/
-│       └── shuffle.js          // Fisher-Yates shuffle utility
-├── /assets/icons/*.svg         // card icon SVGs (12-24 icons per difficulty)
+│ ├── index.html
+│ ├── styles.css
+│ ├── main.js // entry point, app initialization
+│ ├── modules/
+│ │ ├── game.js // game state + core logic
+│ │ ├── dom.js // rendering + event delegation
+│ │ ├── a11y.js // accessibility: focus, ARIA labels
+│ │ └── storage.js // localStorage save/load for best scores
+│ └── utils/
+│ └── shuffle.js // Fisher-Yates shuffle utility
+├── /assets/icons/\*.svg // card icon SVGs (12-24 icons per difficulty)
 └── README.md
+
 ```
 
 - **Framework**: Vanilla JavaScript ES6+ modules (no build step for simplicity).
@@ -40,23 +43,25 @@
 
 ### Game State Shape
 ```
+
 {
-  deck: [
-    { id: 0, icon: 'apple', matched: false },
-    { id: 1, icon: 'apple', matched: false },
-    ...
-  ],
-  flipped: ,              // indices of currently flipped cards[1]
-  matched: new Set(),     // indices of successfully matched pairs[1]
-  moves: 42,
-  score: 410,
-  streakCount: 3,
-  startTime: 1729900000000,     // milliseconds
-  elapsedTime: 45,              // seconds
-  difficulty: 'medium',          // 'easy' | 'medium' | 'hard'
-  isPaused: false,
-  isWon: false
+deck: [
+{ id: 0, icon: 'apple', matched: false },
+{ id: 1, icon: 'apple', matched: false },
+...
+],
+flipped: , // indices of currently flipped cards[1]
+matched: new Set(), // indices of successfully matched pairs[1]
+moves: 42,
+score: 410,
+streakCount: 3,
+startTime: 1729900000000, // milliseconds
+elapsedTime: 45, // seconds
+difficulty: 'medium', // 'easy' | 'medium' | 'hard'
+isPaused: false,
+isWon: false
 }
+
 ```
 
 ### Shuffle Implementation
@@ -73,6 +78,7 @@
 
 ### DOM Structure
 ```
+
 <div id="game-container" class="game">
   <header>
     <h1>Memory Card Game</h1>
@@ -100,10 +106,11 @@
 ```
 
 ### Card Element
+
 ```
-<button 
-  class="card" 
-  data-id="0" 
+<button
+  class="card"
+  data-id="0"
   data-icon="apple"
   aria-pressed="false"
   aria-label="Card 1">
@@ -113,12 +120,14 @@
 ```
 
 ### Event Delegation Strategy
+
 - Single `click` listener on `#board` with `e.target.closest('.card')`.
 - Keyboard listeners on `document` for pause (P), restart (R), arrow navigation.
 - Lock input during flip animations and comparison delay.
 - Debounce: set `isLocked` flag during 500ms flip duration; release after match/mismatch logic.
 
 ### Acceptance Criteria
+
 - ✓ Clicks and keyboard (Enter/Space) flip cards.
 - ✓ No double-flips within same pair selection.
 - ✓ No race conditions (input locked during animations).
@@ -126,25 +135,28 @@
 ## 5) Core Game Logic
 
 ### Turn Flow
+
 1. **First card flip**: Store `flipped[0]`, keep card face-up.
 2. **Second card flip**: Store `flipped[1]`.
 3. **Compare**:
-   - If `deck[flipped[0]].icon === deck[flipped[1]].icon`:
-     - Mark both as `matched`, add to `matched` Set.
-     - **Score**: +10 points; if `streakCount++ === 3`, add +5 bonus.
-     - Keep both face-up.
-   - Else:
-     - **Score**: −2 points.
-     - Reset `streakCount` to 0.
-     - After 800ms delay, flip both face-down.
+    - If `deck[flipped[0]].icon === deck[flipped[1]].icon`:
+        - Mark both as `matched`, add to `matched` Set.
+        - **Score**: +10 points; if `streakCount++ === 3`, add +5 bonus.
+        - Keep both face-up.
+    - Else:
+        - **Score**: −2 points.
+        - Reset `streakCount` to 0.
+        - After 800ms delay, flip both face-down.
 4. **Moves**: Increment after every pair comparison.
 5. **Timer**: Increment elapsed seconds every 1000ms (unless paused).
 
 ### Win Condition
+
 - Check if `matched.size === deck.length / 2`.
 - Stop timer, show modal with stats: time, score, best time (from localStorage).
 
 ### Acceptance Criteria
+
 - ✓ Rules enforced across all difficulties.
 - ✓ Score/streak logic verified with unit tests.
 - ✓ Timer accurate to ±1 second.
@@ -153,6 +165,7 @@
 ## 6) Animation & Performance
 
 ### CSS Transitions
+
 ```
 .card {
   perspective: 1000px;
@@ -165,16 +178,18 @@
 ```
 
 ### JavaScript Animation Orchestration
+
 - Use `requestAnimationFrame` for frame-perfect timing.
 - Chain animations with callbacks:
-  ```
-  flip(cardEl, true); // trigger CSS transform
-  setTimeout(() => {
-    flip(cardEl, false); // unflip after delay
-  }, 800);
-  ```
+    ```
+    flip(cardEl, true); // trigger CSS transform
+    setTimeout(() => {
+      flip(cardEl, false); // unflip after delay
+    }, 800);
+    ```
 
 ### Motion Preferences
+
 ```
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 if (prefersReducedMotion) {
@@ -184,11 +199,13 @@ if (prefersReducedMotion) {
 ```
 
 ### Performance Optimization
+
 - Render cards once on game init; reuse DOM elements.
 - Throttle timer updates to 100ms intervals (display refresh).
 - No excessive reflows: batch DOM updates via `requestAnimationFrame`.
 
 ### Acceptance Criteria
+
 - ✓ Smooth 60 FPS on modern hardware.
 - ✓ Motion reduced when `prefers-reduced-motion` is set.
 - ✓ No janky animations or dropped frames.
@@ -196,27 +213,32 @@ if (prefersReducedMotion) {
 ## 7) Accessibility & UX Polish
 
 ### Semantics & ARIA
+
 - Each card is a `<button>` with `aria-pressed="false|true"`.
 - Use `aria-label` for card position: "Card 1 of 16".
 - Live region (`aria-live="polite"`) announces matches: "Match! +10 points."
 - Game container has `role="main"`.
 
 ### Keyboard Navigation
+
 - Tab through cards (visual focus ring).
 - Enter/Space to flip focused card.
 - R to restart, P to pause.
 - Up/Down/Left/Right to navigate grid.
 
 ### Focus Management
+
 - Keep focus on the last interacted card.
 - Visible focus ring: `outline: 3px solid #0066cc;`
 
 ### Visual Accessibility
+
 - **Contrast**: All text ≥ 4.5:1 against backgrounds (WCAG AA).
 - **Touch targets**: Cards ≥ 44×44px.
 - **Responsive**: Grid adapts to mobile, tablet, desktop.
 
 ### Acceptance Criteria
+
 - ✓ Full keyboard play without mouse.
 - ✓ Screen reader announces game state, matches, score.
 - ✓ Lighthouse Accessibility score ≥ 95.
@@ -225,6 +247,7 @@ if (prefersReducedMotion) {
 ## 8) Persistence, Results & QA
 
 ### Local Storage Schema
+
 ```
 // storage.js
 const scores = {
@@ -236,11 +259,13 @@ localStorage.setItem('memoryGameScores', JSON.stringify(scores));
 ```
 
 ### Save/Load Logic
+
 - On game win: Compare current score/time with best saved; update if better.
 - On app load: Fetch saved best times from `localStorage` and display.
 - Add version field to detect schema changes in future updates.
 
 ### Win Modal
+
 ```
 <div class="modal" id="winModal" role="dialog" aria-labelledby="modalTitle">
   <h2 id="modalTitle">🎉 You Won!</h2>
@@ -252,6 +277,7 @@ localStorage.setItem('memoryGameScores', JSON.stringify(scores));
 ```
 
 ### Unit Tests
+
 ```
 // game.test.js
 describe('Fisher-Yates Shuffle', () => {
@@ -272,6 +298,7 @@ describe('Timer', () => {
 ```
 
 ### Manual QA Checklist
+
 - [ ] **Mobile**: Play on iPhone SE, Android (375px width). Cards clickable. No overflow.
 - [ ] **Desktop**: Test on Chrome, Firefox, Safari. Smooth animations. Focus visible.
 - [ ] **Slow CPU**: Test on throttled device (DevTools). No animations freeze.
@@ -280,6 +307,7 @@ describe('Timer', () => {
 - [ ] **Storage**: Play 3 games, clear browser cache, reload. Best scores persist.
 
 ### Acceptance Criteria
+
 - ✓ All unit tests pass.
 - ✓ Best scores persist across sessions.
 - ✓ Lighthouse Performance ≥ 90, Accessibility ≥ 95, Best Practices ≥ 90.
@@ -288,8 +316,12 @@ describe('Timer', () => {
 ---
 
 ## Deliverables
+
 - **Source code**: `/memory-game` directory with all modules.
 - **README.md**: Setup instructions, features list, how to run tests.
 - **Lighthouse report** (screenshot or JSON export).
 - **Accessibility checklist** with manual test notes (WCAG 2.1 AA compliance verified).
+
+```
+
 ```
