@@ -1,0 +1,42 @@
+{
+    "name": "memory-card-game",
+    "version": "1.0.0",
+    "description": "A fully accessible, responsive memory card matching game built with vanilla JavaScript ES6+ modules",
+    "type": "module",
+    "main": "main.js",
+    "scripts": {
+        "lint": "eslint . --ext .js",
+        "lint:fix": "eslint . --ext .js --fix",
+        "format": "prettier --write \"**/*.{js,html,css,json,md}\"",
+        "format:check": "prettier --check \"**/*.{js,html,css,json,md}\"",
+        "test": "vitest run",
+        "test:watch": "vitest",
+        "test:coverage": "vitest run --coverage",
+        "validate": "npm run lint && npm run format:check && npm run test"
+    },
+    "keywords": [
+        "memory-game",
+        "card-game",
+        "accessibility",
+        "vanilla-javascript",
+        "es6-modules"
+    ],
+    "author": "",
+    "license": "MIT",
+    "devDependencies": {
+        "@eslint/js": "^9.15.0",
+        "eslint": "^9.15.0",
+        "globals": "^15.12.0",
+        "prettier": "^3.3.3",
+        "vitest": "^2.1.0",
+        "@vitest/coverage-v8": "^2.1.0",
+        "jsdom": "^24.1.0"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/bosk8/memory-card-game.git"
+    },
+    "engines": {
+        "node": ">=18.0.0"
+    }
+}
