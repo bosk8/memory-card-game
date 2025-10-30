@@ -7,13 +7,15 @@
         <link rel="stylesheet" href="styles.css" />
     </head>
     <body>
-        <div id="game-container" class="game">
+        <main class="bosk8">
+            <div class="container">
+                <div id="game-container" class="game card">
             <header>
-                <h1>Memory Card Game</h1>
+                <h1 class="tagline">MEMORY CARD GAME</h1>
                 <div class="stats">
-                    <span class="timer">Time: <span id="timer">0</span>s</span>
-                    <span class="score">Score: <span id="score">0</span></span>
-                    <span class="moves">Moves: <span id="moves">0</span></span>
+                    <span class="timer meta-sm">TIME: <span id="timer">0</span>s</span>
+                    <span class="score meta-sm">SCORE: <span id="score">0</span></span>
+                    <span class="moves meta-sm">MOVES: <span id="moves">0</span></span>
                 </div>
             </header>
 
@@ -31,9 +33,21 @@
                 <!-- Cards rendered here by JS -->
             </div>
 
+            <section class="best-scores card" aria-labelledby="bestScoresTitle">
+                <h2 id="bestScoresTitle" class="tagline">BEST SCORES</h2>
+                <div class="best-scores-grid">
+                    <div class="meta-sm">EASY: <span id="bestEasy">--</span></div>
+                    <div class="meta-sm">MEDIUM: <span id="bestMedium">--</span></div>
+                    <div class="meta-sm">HARD: <span id="bestHard">--</span></div>
+                </div>
+                <div id="storageNotice" class="meta-sm" role="status" aria-live="polite" hidden></div>
+            </section>
+
             <!-- Live region for screen reader announcements -->
             <div id="announcements" aria-live="polite" aria-atomic="true" class="sr-only"></div>
-        </div>
+                </div>
+            </div>
+        </main>
 
         <!-- Win Modal -->
         <div
@@ -43,12 +57,12 @@
             aria-labelledby="modalTitle"
             aria-hidden="true"
         >
-            <div class="modal-content">
-                <h2 id="modalTitle">🎉 You Won!</h2>
+            <div class="modal-content card">
+                <h2 id="modalTitle" class="tagline">YOU WON</h2>
                 <p>Time: <span id="finalTime">0</span>s</p>
                 <p>Score: <span id="finalScore">0</span></p>
                 <p>Best Time: <span id="bestTime">--</span>s</p>
-                <button id="playAgain">Play Again</button>
+                <button id="playAgain" class="copy-btn"><span class="label">PLAY AGAIN</span></button>
             </div>
         </div>
 
