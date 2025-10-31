@@ -76,23 +76,12 @@ export class AccessibilityManager {
             }
         });
 
-        // Handle modal focus management
-        const modal = document.getElementById('winModal');
-        if (modal) {
-            modal.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') {
-                    this.closeModalAndRestoreFocus();
-                }
-            });
-        }
+        // Note: Modal Escape key handling is done in main.js to avoid duplicate handlers
     }
 
     closeModalAndRestoreFocus() {
-        const modal = document.getElementById('winModal');
-        modal.setAttribute('aria-hidden', 'true');
-        modal.style.display = 'none';
-
         // Restore focus to last focused element or first card
+        // Note: Modal visibility is handled by caller (main.js)
         if (this.lastFocusedElement && this.lastFocusedElement.classList.contains('card') && this.lastFocusedElement.tagName === 'BUTTON') {
             this.lastFocusedElement.focus();
         } else {

@@ -10,6 +10,9 @@ class MemoryGameApp {
         this.renderer = new DOMRenderer();
         this.a11y = new AccessibilityManager();
         this.storage = new StorageManager();
+        this.timerUpdateInterval = null;
+        this.previousScore = 0;
+        this.previousStreakCount = 0;
 
         this.init();
     }
@@ -29,6 +32,26 @@ class MemoryGameApp {
 
         // Load best scores and render panel
         this.initBestScoresPanel();
+
+        // Start timer UI update interval
+        this.startTimerUpdates();
+    }
+
+    startTimerUpdates() {
+        // Update timer display every second when game is running
+        this.timerUpdateInterval = setInterval(() => {
+            const state = this.game.getState();
+            if (state.startTime !== null && !state.isPaused && !state.isWon) {
+                this.renderer.updateStats(state);
+            }
+        }, 1000);
+    }
+
+    stopTimerUpdates() {
+        if (this.timerUpdateInterval) {
+            clearInterval(this.timerUpdateInterval);
+            this.timerUpdateInterval = null;
+        }
     }
 
     setupEventListeners() {
@@ -37,6 +60,9 @@ class MemoryGameApp {
         difficultySelect.addEventListener('change', (e) => {
             this.game.init(e.target.value);
             this.renderer.renderBoard(this.game.getState());
+            this.a11y.announceGameStart(e.target.value);
+            this.previousScore = 0;
+            this.previousStreakCount = 0;
         });
 
         // Restart button
@@ -44,13 +70,18 @@ class MemoryGameApp {
         restartBtn.addEventListener('click', () => {
             this.game.restart();
             this.renderer.renderBoard(this.game.getState());
+            this.a11y.announceRestart();
+            this.previousScore = 0;
+            this.previousStreakCount = 0;
         });
 
         // Pause button
         const pauseBtn = document.getElementById('pause');
         pauseBtn.addEventListener('click', () => {
             this.game.togglePause();
-            this.renderer.updatePauseButton(this.game.getState().isPaused);
+            const isPaused = this.game.getState().isPaused;
+            this.renderer.updatePauseButton(isPaused);
+            this.a11y.announcePause(isPaused);
         });
 
         // Play again button
@@ -100,26 +131,39 @@ class MemoryGameApp {
             
             // If two cards are flipped, update UI after match check completes
             if (state.flipped.length === 2) {
-                // Capture flipped card IDs before they're cleared
+                // Capture state before match check
                 const flippedIds = [...state.flipped];
+                const scoreBeforeMatch = state.score;
+                const streakCountBeforeMatch = state.streakCount;
                 
                 setTimeout(() => {
+                    const newState = this.game.getState();
+                    
                     // Update all cards and stats after match check
                     flippedIds.forEach(id => {
-                        this.renderer.updateCard(id, this.game.getState());
+                        this.renderer.updateCard(id, newState);
                     });
-                    this.renderer.updateStats(this.game.getState());
+                    this.renderer.updateStats(newState);
+
+                    // Detect match/mismatch and announce
+                    const scoreDiff = newState.score - scoreBeforeMatch;
+                    
+                    if (scoreDiff === 15) {
+                        // Match with streak bonus (+10 for match + 5 for bonus)
+                        this.a11y.announceStreakBonus(newState.score);
+                    } else if (scoreDiff === 10) {
+                        // Regular match
+                        this.a11y.announceMatch(newState.score);
+                    } else if (scoreDiff === -2) {
+                        // Mismatch
+                        this.a11y.announceMismatch(newState.score);
+                    }
 
                     // Check for win condition after match check
-                    if (this.game.getState().isWon) {
+                    if (newState.isWon) {
                         this.handleWin();
                     }
                 }, 800);
-            }
-
-            // Check for win condition
-            if (this.game.getState().isWon) {
-                this.handleWin();
             }
         }
     }
@@ -130,11 +174,16 @@ class MemoryGameApp {
                 e.preventDefault();
                 this.game.restart();
                 this.renderer.renderBoard(this.game.getState());
+                this.a11y.announceRestart();
+                this.previousScore = 0;
+                this.previousStreakCount = 0;
                 break;
             case 'p':
                 e.preventDefault();
                 this.game.togglePause();
-                this.renderer.updatePauseButton(this.game.getState().isPaused);
+                const isPaused = this.game.getState().isPaused;
+                this.renderer.updatePauseButton(isPaused);
+                this.a11y.announcePause(isPaused);
                 break;
             case 'enter':
             case ' ':
@@ -175,6 +224,9 @@ class MemoryGameApp {
         modal.setAttribute('aria-hidden', 'false');
         modal.style.display = 'flex';
 
+        // Set up focus trap
+        this.a11y.trapFocusInModal(modal);
+
         // Focus on play again button
         document.getElementById('playAgain').focus();
     }
@@ -183,6 +235,9 @@ class MemoryGameApp {
         const modal = document.getElementById('winModal');
         modal.setAttribute('aria-hidden', 'true');
         modal.style.display = 'none';
+        
+        // Restore focus using accessibility manager
+        this.a11y.closeModalAndRestoreFocus();
     }
 
     // Best Scores panel
